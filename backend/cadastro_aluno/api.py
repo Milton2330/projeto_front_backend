@@ -169,7 +169,6 @@ def consultar_detalhe_por_nome(request, nome: str):
 # def inserir_aluno(request, payload: AlunoCreateSchema):
 #     # Converte o schema validado em um dicionário
 #     dados_para_criar = payload.dict()
-#     disciplinas_ids = payload.disciplinas_ids
 #     try:
         
 #         # O ' ** ' desempacota o dicionário, passando os valores
