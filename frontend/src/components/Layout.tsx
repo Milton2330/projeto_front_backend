@@ -8,7 +8,7 @@ const layoutStyle = {
 
 const sidebarStyle = {
   width: "220px",
-  backgroundColor: "#f4f4f4",
+  backgroundColor: "#5a4f4fff",
   padding: "20px",
   borderRight: "1px solid #ccc",
 };

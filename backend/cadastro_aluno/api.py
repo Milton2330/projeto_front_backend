@@ -37,11 +37,11 @@ def consulta_discplina(request, discplina_id: int):
     except Exception as e:
         return 400, {"mensagem": f"Erro ao consultar disciplina por id: {e}"}
 
-@router.get("/disciplina-por-semestre/{semestre}", response=list[DisciplinaCompletaSchema])
+@router.get("/disciplina-por-semestre/{semestre}", 
+            response=list[DisciplinaCompletaSchema], 
+            summary= "Consulta de Disciplinas", 
+            description="Consulta disciplinas por semestre.")
 def consulta_disciplinas_por_semestre(request, semestre: int):
-    """
-    Consulta disciplinas por semestre usando o ORM do Django.
-    """
     try:
         # Filtro seguro do ORM: .filter(semestre=semestre)
         # .all().values() para manter o padrão das suas outras APIs.
@@ -182,6 +182,16 @@ def atualizar_endereco(request, endereco_id: int, payload: EnderecoUpdateSchema)
     
     except Exception as e:
         return 400, {"mensagem": f"Erro ao atualizar endereço: {e}"}
+    
+@router.delete("deletar-endereco/{endereco_id}")
+def deletar_endereco(request, endereco_id: int):
+    try:
+        endereco = TbEnderecos.objects.get(id=endereco_id)
+        endereco.delete()
+        return {"mensagem": "Endereço deletado com sucesso"}
+    except TbEnderecos.DoesNotExist:
+        return 400,{"mensagem": "Endereço não encontrado"}
+    
 #################### ALUNOS ########################
 
 @router.get("/consultar-alunos")
@@ -204,18 +214,29 @@ def consultar_alunos_por_nome(request, nome: str):
 
 
 # Atualizar aluno
-@router.put("/atualizar-aluno/{aluno_id}", response=dict)
+
+@router.put("/atualizar-aluno/{aluno_id}", response={200: dict, 400: MensagemErro, 404: MensagemErro})
 def atualizar_aluno(request, aluno_id: int, dados: AlunoUpdateSchema):
-    qs = TbAlunos.objects.filter(id=aluno_id).update(**dados.dict())
-    return {"mensagem": "Aluno atualizado com sucesso"}
+    try:
+        qs = TbAlunos.objects.filter(id=aluno_id).update(**dados.dict())
+        return {"mensagem": "Aluno atualizado com sucesso"}
+    except Exception as e:
+        return 400, {"mensagem": f"Erro ao atualizar aluno: {e}"}
+    
 
 #delete 
-@router.delete("/deletar-alunos/{aluno_id}")
+@router.delete("/deletar-alunos/{aluno_id}" ,response={200: MensagemErro, 404: MensagemErro, 400: MensagemErro})
 def deletar_aluno(request, aluno_id: int):
-    aluno = TbAlunos.objects.get(id=aluno_id)
-    aluno.delete()
-    # 4. Retorna a mensagem de sucesso
-    return {"mensagem": f"Aluno com ID {aluno_id} deletado com sucesso"}
+    try:
+
+        aluno = TbAlunos.objects.get(id=aluno_id)
+        aluno.delete()
+        return {"mensagem": f"Aluno com ID {aluno_id} deletado com sucesso"}
+    except TbAlunos.DoesNotExist:
+        return 404, {"mensagem": f"Aluno com ID {aluno_id} não encontrado."}
+    
+    except Exception as e:
+        return 400, {"mensagem": f"Erro ao deletar aluno: {e}"}     
 
 @router.get("/alunos-por-nome/{nome}", response=list[AlunosSchema])
 def consultar_alunos_por_nome(request, nome: str):
